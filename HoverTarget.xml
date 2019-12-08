@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Script file="HoverTarget.lua"/>
+	<Button name="HoverTargetFrame" inherits="TargetFrameTemplate" hidden="true">
+		<Scripts>
+			<OnLoad function="HoverTargetFrame_OnLoad"/>
+			<OnHide function="HoverTargetFrame_OnHide"/>
+			<OnEvent function="HoverTargetFrame_OnEvent"/>
+			<OnUpdate function="HoverTargetFrame_OnUpdate"/>
+		</Scripts>
+	</Button>
+
+</Ui>

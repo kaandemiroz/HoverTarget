@@ -1,0 +1,8 @@
+## Interface: 11302
+## Author: Shadock
+## Title: HoverTarget
+## Version: 0.1.0
+## Notes: Shows a target frame above the tooltip for the unit you're hovering
+
+HoverTarget.xml
+HoverTarget.lua
