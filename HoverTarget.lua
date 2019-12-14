@@ -10,6 +10,10 @@ local FRAME_OFFSET_X = 40
 local FRAME_OFFSET_Y = 40
 local UNIT_MOUSEOVER = "mouseover"
 
+local function IsVisible(frame)
+	return frame:IsShown() and frame:GetAlpha() > 0
+end
+
 function HoverTargetFrame:Initialize ()
 	self:SetScript("OnHide", self.OnHide)
 	self:SetScript("OnEvent", self.OnEvent)
@@ -54,6 +58,11 @@ function HoverTargetFrame:OnLoad ()
 	self.totFrame:SetScript("OnUpdate", function (elapsed) self:TargetofTarget_Update(self.totFrame, elapsed) end)
 
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+
+	self:Show()
+	self:SetAlpha(0)
+	self.totFrame:Show()
+	self.totFrame:SetAlpha(0)
 end
 
 function HoverTargetFrame:MouseoverUnit ()
@@ -96,13 +105,9 @@ function HoverTargetFrame:Target_Update ()
 	-- This check is here so the frame will hide when the target goes away
 	-- even if some of the functions below are hooked by addons.
 	if ( not UnitExists(self.unit) and not ShowBossFrameWhenUninteractable(self.unit) ) then
-		if not InCombatLockdown() then
-			self:Hide();
-		end
+		self:SetAlpha(0);
 	else
-		if not InCombatLockdown() then
-			self:Show();
-		end
+		self:SetAlpha(1);
 
 		-- Moved here to avoid taint from functions below
 		if ( self.totFrame ) then
@@ -145,13 +150,10 @@ function HoverTargetFrame:TargetofTarget_Update (self, elapsed)
 		return
 	end
 
-	local show;
 	local parent = self:GetParent();
 	if ( SHOW_TARGET_OF_TARGET == "1" and UnitExists(parent.unit) and UnitExists(self.unit) and ( not UnitIsUnit(PlayerFrame.unit, parent.unit) ) and ( UnitHealth(parent.unit) > 0 ) ) then
-		if ( not self:IsShown() ) then
-			if not InCombatLockdown() then
-				self:Show();
-			end
+		if ( not IsVisible(self)) then
+			self:SetAlpha(1);
 			if ( parent.spellbar ) then
 				parent.haveToT = true;
 				Target_Spellbar_AdjustPosition(parent.spellbar);
@@ -162,10 +164,8 @@ function HoverTargetFrame:TargetofTarget_Update (self, elapsed)
 		TargetofTargetHealthCheck(self);
 		RefreshDebuffs(self, self.unit, nil, nil, true);
 	else
-		if ( self:IsShown() ) then
-			if not InCombatLockdown() then
-				self:Hide();
-			end
+		if ( IsVisible(self) ) then
+			self:SetAlpha(0);
 			if ( parent.spellbar ) then
 				parent.haveToT = nil;
 				Target_Spellbar_AdjustPosition(parent.spellbar);
@@ -175,18 +175,20 @@ function HoverTargetFrame:TargetofTarget_Update (self, elapsed)
 end
 
 function HoverTargetFrame:OnHide ()
+	self:SetAlpha(0)
 	if InCombatLockdown() then
 		return
 	end
 	self:SetParent(nil)
-	self:Hide()
 	self.isInit = false
 end
 
 function HoverTargetFrame:OnUpdate (elapsed)
 	local unit = UNIT_MOUSEOVER
 	if UnitExists(unit) and not InCombatLockdown() then
-		TargetFrame_OnUpdate(self, elapsed)
+		if ( self.totFrame and IsVisible(self.totFrame) ~= UnitExists(self.totFrame.unit) ) then
+			self:TargetofTarget_Update(self.totFrame, elapsed);
+		end
 	end
 end
 
@@ -196,10 +198,10 @@ function HoverTargetFrame:OnEvent (event, ...)
 	end
 end
 
-hooksecurefunc("GameTooltip_ClearInsertedFrames", function (self)
-	if not InCombatLockdown() then
-		HoverTargetFrame:Hide()
-	end
-end)
+-- hooksecurefunc("GameTooltip_ClearInsertedFrames", function (self)
+-- 	if not InCombatLockdown() then
+-- 		HoverTargetFrame:SetAlpha(0)
+-- 	end
+-- end)
 
 HoverTargetFrame:Initialize()
