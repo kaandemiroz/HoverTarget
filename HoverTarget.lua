@@ -55,7 +55,7 @@ function HoverTargetFrame:OnLoad ()
 	UnitFrame_SetUnit(self, unit,  self.healthbar,  self.manabar)
 	UnitFrame_SetUnit (self.totFrame, totUnit, self.totFrame.healthbar, self.totFrame.manabar)
 
-	self.totFrame:SetScript("OnUpdate", function (elapsed) self:TargetofTarget_Update(self.totFrame, elapsed) end)
+	self.totFrame:SetScript("OnUpdate", self.TargetofTarget_OnUpdate)
 
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 
@@ -146,10 +146,6 @@ end
 
 -- Modified code from Blizzard's TargetFrame.lua to control in-combat execution
 function HoverTargetFrame:TargetofTarget_Update (self, elapsed)
-	if not UnitExists(self.unit) then
-		return
-	end
-
 	local parent = self:GetParent();
 	if ( SHOW_TARGET_OF_TARGET == "1" and UnitExists(parent.unit) and UnitExists(self.unit) and ( not UnitIsUnit(PlayerFrame.unit, parent.unit) ) and ( UnitHealth(parent.unit) > 0 ) ) then
 		if ( not IsVisible(self)) then
@@ -184,11 +180,17 @@ function HoverTargetFrame:OnHide ()
 end
 
 function HoverTargetFrame:OnUpdate (elapsed)
-	local unit = UNIT_MOUSEOVER
-	if UnitExists(unit) and not InCombatLockdown() then
+	if UnitExists(self.unit) then
 		if ( self.totFrame and IsVisible(self.totFrame) ~= UnitExists(self.totFrame.unit) ) then
 			self:TargetofTarget_Update(self.totFrame, elapsed);
 		end
+	end
+end
+
+function HoverTargetFrame:TargetofTarget_OnUpdate (elapsed)
+	local parent = self:GetParent()
+	if UnitExists(parent.unit) and IsVisible(self) then
+		parent:TargetofTarget_Update(self, elapsed)
 	end
 end
 
@@ -199,9 +201,7 @@ function HoverTargetFrame:OnEvent (event, ...)
 end
 
 -- hooksecurefunc("GameTooltip_ClearInsertedFrames", function (self)
--- 	if not InCombatLockdown() then
--- 		HoverTargetFrame:SetAlpha(0)
--- 	end
+-- 	HoverTargetFrame:SetAlpha(0)
 -- end)
 
 HoverTargetFrame:Initialize()
