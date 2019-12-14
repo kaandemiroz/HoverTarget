@@ -51,7 +51,7 @@ function HoverTargetFrame:OnLoad ()
 	UnitFrame_SetUnit(self, unit,  self.healthbar,  self.manabar)
 	UnitFrame_SetUnit (self.totFrame, totUnit, self.totFrame.healthbar, self.totFrame.manabar)
 
-	self.totFrame:SetScript("OnUpdate", TargetofTarget_Update)
+	self.totFrame:SetScript("OnUpdate", function (elapsed) self:TargetofTarget_Update(self.totFrame, elapsed) end)
 
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 end
@@ -141,6 +141,10 @@ end
 
 -- Modified code from Blizzard's TargetFrame.lua to control in-combat execution
 function HoverTargetFrame:TargetofTarget_Update (self, elapsed)
+	if not UnitExists(self.unit) then
+		return
+	end
+
 	local show;
 	local parent = self:GetParent();
 	if ( SHOW_TARGET_OF_TARGET == "1" and UnitExists(parent.unit) and UnitExists(self.unit) and ( not UnitIsUnit(PlayerFrame.unit, parent.unit) ) and ( UnitHealth(parent.unit) > 0 ) ) then
