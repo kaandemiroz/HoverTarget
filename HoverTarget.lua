@@ -29,6 +29,7 @@ function HoverTargetFrame:InitializePoint()
 	self:ClearAllPoints()
 	self:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMLEFT", anchorRight, anchorBottom)
 	-- self:SetPoint("BOTTOMRIGHT", GameTooltip, "TOPRIGHT", FRAME_OFFSET_X, FRAME_OFFSET_Y)
+	self:Show()
 end
 
 function HoverTargetFrame:OnLoad ()
