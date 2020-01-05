@@ -124,7 +124,9 @@ function HoverTargetFrame:Target_Update ()
 			TargetFrame_CheckClassification(self);
 		end
 		TargetFrame_CheckDead(self);
-		TargetFrame_CheckDishonorableKill(self);
+		if (TargetFrame_CheckDishonorableKill) then
+			TargetFrame_CheckDishonorableKill(self);
+		end
 		if ( self.showLeader ) then
 			if ( UnitLeadsAnyGroup(self.unit) ) then
 				self.leaderIcon:SetTexture("Interface\\GroupFrame\\UI-Group-LeaderIcon");
