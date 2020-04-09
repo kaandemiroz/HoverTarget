@@ -4,8 +4,6 @@ local HoverTarget = addon
 
 local HoverTargetFrame = CreateFrame("Button", "HoverTargetFrame", GameTooltip, "TargetFrameTemplate")
 
-local isInit = false
-
 local FRAME_OFFSET_X = 40
 local FRAME_OFFSET_Y = 40
 local UNIT_MOUSEOVER = "mouseover"
@@ -21,7 +19,7 @@ function HoverTargetFrame:Initialize ()
 	self:OnLoad()
 end
 
-function HoverTargetFrame:InitializePoint()
+function HoverTargetFrame:UpdatePoint ()
 	local anchorRight = GameTooltip:GetRight() + FRAME_OFFSET_X
 	local anchorBottom = GameTooltip:GetTop() + FRAME_OFFSET_Y
 
@@ -85,9 +83,8 @@ function HoverTargetFrame:SetUnit (unit)
 		return
 	end
 
-	if not self.isInit and not InCombatLockdown() then
-		self:InitializePoint()
-		self.isInit = true
+	if not InCombatLockdown() then
+		self:UpdatePoint()
 	end
 
 	self.healthbar.lockValues = false
@@ -175,11 +172,6 @@ end
 
 function HoverTargetFrame:OnHide ()
 	self:SetAlpha(0)
-	if InCombatLockdown() then
-		return
-	end
-	self:SetParent(nil)
-	self.isInit = false
 end
 
 function HoverTargetFrame:OnUpdate (elapsed)
