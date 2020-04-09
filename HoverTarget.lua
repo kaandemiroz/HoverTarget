@@ -172,6 +172,10 @@ end
 
 function HoverTargetFrame:OnHide ()
 	self:SetAlpha(0)
+	if InCombatLockdown() then
+		return
+	end
+	self:SetParent(nil)
 end
 
 function HoverTargetFrame:OnUpdate (elapsed)
